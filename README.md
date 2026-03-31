@@ -89,4 +89,4 @@ npm run build
 
 - 感谢 Anthropic提供Claude Code原始项目
 - 感谢 Codex参与本仓库的恢复整理、编译修复与文档编写
-- 感谢 LinuxDo论坛里可爱的佬友们提供的帮助
+- 感谢 [LinuxDo](https://linux.do/)论坛里可爱的佬友们提供的帮助
