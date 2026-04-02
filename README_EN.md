@@ -1,6 +1,8 @@
 # open-claude-code
 
-[中文](README.md)/[English](README_EN.md)
+<p align="center">
+  <strong>English</strong> · <a href="./README.md">中文</a>
+</p>
 
 `open-claude-code` is reconstructed from sourcemap information related to `@anthropic-ai/claude-code@2.1.88`. Based on that recovery work, this repository includes build fixes, structural restoration, and runtime adjustments. Current status: the project has been repaired and can be run locally for code reading and study.
 
@@ -20,6 +22,22 @@ This repository mainly preserves the core engineering structure of the Claude Co
 - `stubs/`: local stub dependencies
 - `images/`: demo screenshots
 
+### Private MCP/NAPI compatibility and related status
+
+The items below describe the current state of the private MCP and related native / NAPI compatibility layers in this recovered build. The table explicitly separates **import/build coverage** from **real runtime capability**:
+
+| Component | Progress | Availability |
+| --- | --- | --- |
+| `@ant/claude-for-chrome-mcp` | A minimal compatibility layer is in place, and the browser MCP tool definitions are restored for local builds. | Tool listing works, and read-style calls return empty payloads or unavailable responses; it **does not** reconnect the real browser extension, pairing flow, or browser bridge execution backend. |
+| `@ant/computer-use-mcp` | A minimal compatibility layer is in place, including the main package and required subpath exports. | It can serve minimal state-oriented interfaces such as `request_access`, `list_granted_applications`, `current_display`, `switch_display`, and `list_displays`; real Computer Use actions such as mouse, keyboard, screenshot, and clipboard control are still placeholder / unavailable. |
+| `@ant/computer-use-input` | A minimal stub is in place. | It currently only exposes the degraded semantic `isSupported = false` to avoid missing-package failures; it **does not** provide a real input injection backend. |
+| `@ant/computer-use-swift` | A minimal macOS native compatibility shape is in place. | Permission, app, and display queries return empty or default values; screenshot capture, app launching, and capture preparation are still not restored. |
+| `image-processor-napi` | Recovered through an open replacement based on `sharp`, with compatible exports added. | Regular image reading, resizing, and compression paths are basically usable; however, `getNativeModule()` currently returns `null`, so image / clipboard flows that expected the native fast path fall back to the existing non-native path. |
+| `color-diff-napi` | No longer depends on the native package; it has been replaced with a local TypeScript implementation. | The main structured diff and syntax-highlighting flow is usable; however, it is based on `highlight.js` rather than the original native stack, so details such as `BAT_THEME` are still compatibility behavior, not a 1:1 restoration. |
+| `audio-capture-napi` | A minimal stub is in place so voice features no longer crash on missing-package import. | Windows still needs a real native recording backend and is currently unavailable; Linux / macOS can still try the existing `arecord` / `rec` fallback chain in the project, but that is not the same as restoring the original native audio capture implementation. |
+
+> In plain terms: these layers are now good enough to keep the recovered project buildable, runnable for study, and readable; `image-processor-napi` and `color-diff-napi` are closer to practical substitutes, while browser bridge, computer-use, and native audio are still mostly in graceful-degradation territory.
+
 ## Requirements
 
 - Node.js 18 or later
@@ -31,25 +49,25 @@ This repository mainly preserves the core engineering structure of the Claude Co
 Install dependencies:
 
 ```bash
-npm install
+bun install or npm install
 ```
 
-Check the restored version:
+Check the version:
 
 ```bash
-npm run smoke
+bun run version or npm run version
 ```
 
 Start directly:
 
 ```bash
-node ./dist/cli.js
+bun run dev or npm run dev
 ```
 
 Rebuild if needed:
 
 ```bash
-npm run build
+bun run build or npm run build
 ```
 
 ## Screenshots
@@ -61,6 +79,8 @@ npm run build
 ### Interaction
 
 ![Interaction](./images/snapshot2.png)
+
+![Interaction2](./images/snapshot3.png)
 
 ## Disclaimer
 
